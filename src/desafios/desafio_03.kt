@@ -1,7 +1,7 @@
 package desafios
 
 data class Produto(
-    val id: Int?,
+    val id: Int,
     val nome: String,
     val preco: Double,
     val quantidade: Int
@@ -9,10 +9,10 @@ data class Produto(
 
 interface Estoque<T> {
     fun inserir(item: T)
-    fun deletar(id: Int) : Boolean
-    fun atualizar(item: T) : Boolean
-    fun buscar(id: Int) : T
-    fun buscarTodos() : List<T>
+    fun deletar(id: Int): Boolean
+    fun atualizar(item: T): Boolean
+    fun buscar(id: Int): T?
+    fun buscarTodos(): List<T>
 }
 
 class EstoqueDeProdutos: Estoque<Produto> {
@@ -26,119 +26,134 @@ class EstoqueDeProdutos: Estoque<Produto> {
         return listaProdutos.removeIf { it.id == id }
     }
 
-    override fun atualizar(item: Produto): Boolean {
-        if (listaProdutos.removeIf { it.id == item.id }){
-            listaProdutos.add(item)
-            return true
-        } else {
-            return false
-        }
-    }
-
-    override fun buscar(id: Int): Produto {
-        return listaProdutos.find { it.id == id } ?: throw Exception("Produto não encontrado")
+    override fun buscar(id: Int): Produto? {
+        return listaProdutos.find { it.id == id }
     }
 
     override fun buscarTodos(): List<Produto> {
         return listaProdutos.toList()
     }
 
-}
-
-fun preencherProduto(): Produto {
-    var id: Int? = null
-    while (id == null){
-        println("Informe o ID do produto: ")
-        print("-> ")
-        id = readlnOrNull()?.toIntOrNull()
-        if (id == null){
-            println("ID informado é inválido. Tente novamente.")
-        }
+    override fun atualizar(item: Produto): Boolean {
+        if (listaProdutos.removeIf { it.id == item.id }) {
+            listaProdutos.add(item)
+            return true
+        } else
+            return false
     }
 
-    var nome: String? = null
-    while (nome == null){
-        println("Informe o NOME do produto: ")
-        print("-> ")
-        nome = readlnOrNull()
-        if (nome == null){
-            println("NOME informado é inválido. Tente novamente.")
-        }
-    }
-
-    var preco: Double? = null
-    while (preco == null){
-        println("Informe o PREÇO do produto: ")
-        print("-> ")
-        preco = readlnOrNull()?.toDoubleOrNull()
-        if (preco == null){
-            println("PREÇO informado é inválido. Tente novamente.")
-        }
-    }
-
-    var quantidade: Int? = null
-    while (quantidade == null){
-        println("Informe a QUANTIDADE do produto: ")
-        print("-> ")
-        quantidade = readlnOrNull()?.toIntOrNull()
-        if (quantidade == null){
-            println("QUANTIDADE informada é inválida. Tente novamente.")
-        }
-    }
-
-    return Produto(
-        id = id,
-        nome = nome,
-        preco = preco,
-        quantidade = quantidade
-    )
 }
 
 fun preencherProdutoAtualizado(produtoASerAtualizado: Produto): Produto {
+
     var nome: String? = null
-    while (nome == null){
-        println("Altere o NOME do produto (caso não queira alterar, pressione ENTER): ")
+    println("Altera o NOME do produto (caso não queira mudar, tecle ENTER):")
+    while (nome.isNullOrEmpty()) {
         print("-> ")
         nome = readlnOrNull()?.ifEmpty { produtoASerAtualizado.nome }
-        if (nome == null){
-            println("NOME informado é inválido. Tente novamente.")
+        if (nome.isNullOrEmpty()) {
+            println("O NOME inserido é inválido. Tente novamente.")
         }
     }
 
     var preco: Double? = null
-    while (preco == null){
-        println("Altere o PREÇO do produto (caso não queira alterar, pressione ENTER): ")
-        print("-> ")
+    println("Altere o PREÇO do produto (caso não queira mudar, tecle ENTER):")
+    while (preco.isNullOrNegative()) {
+        print("-> R$ ")
         preco = readlnOrNull()?.ifEmpty { produtoASerAtualizado.preco.toString() }?.toDoubleOrNull()
-        if (preco == null){
-            println("PREÇO informado é inválido. Tente novamente.")
+        if (preco.isNullOrNegative()) {
+            println("O PREÇO inserido é inválido. Tente novamente.")
         }
     }
 
     var quantidade: Int? = null
-    while (quantidade == null){
-        println("Altere a QUANTIDADE do produto (caso não queira alterar, pressione ENTER): ")
+    println("Altere a QUANTIDADE do produto em estoque (caso não queira mudar, tecle ENTER):")
+    while (quantidade.isNullOrNegative()) {
         print("-> ")
         quantidade = readlnOrNull()?.ifEmpty { produtoASerAtualizado.quantidade.toString() }?.toIntOrNull()
-        if (quantidade == null){
-            println("QUANTIDADE informada é inválida. Tente novamente.")
+        if (quantidade.isNullOrNegative()) {
+            println("A QUANTIDADE inserida é inválida. Tente novamente.")
         }
     }
 
     return Produto(
         id = produtoASerAtualizado.id,
         nome = nome,
-        preco = preco,
-        quantidade = quantidade
+        preco = preco!!,
+        quantidade = quantidade!!
     )
+}
+
+fun preencherProdutos(): Produto {
+    var id: Int? = null
+    println("Insira o ID do produto:")
+    while (id.isNullOrNegative()) {
+        print("-> ")
+        id = readlnOrNull()?.toIntOrNull()
+        if (id.isNullOrNegative())
+            println("O ID inserido é inválido. Tente novamente.")
+    }
+
+    var nome: String? = null
+    println("Insira o NOME do produto:")
+    while (nome.isNullOrEmpty()) {
+        print("-> ")
+        nome = readlnOrNull()
+        if (nome.isNullOrEmpty()) {
+            println("O NOME inserido é inválido. Tente novamente.")
+        }
+    }
+
+    var preco: Double? = null
+    println("Insira o PREÇO do produto:")
+    while (preco.isNullOrNegative()) {
+        print("-> R$ ")
+        preco = readlnOrNull()?.toDoubleOrNull()
+        if (preco.isNullOrNegative()) {
+            println("O PREÇO inserido é inválido. Tente novamente.")
+        }
+    }
+
+    var quantidade: Int? = null
+    println("Insira a QUANTIDADE do produto em estoque:")
+    while (quantidade.isNullOrNegative()) {
+        print("-> ")
+        quantidade = readlnOrNull()?.toIntOrNull()
+        if (quantidade.isNullOrNegative()) {
+            println("A QUANTIDADE inserida é inválida. Tente novamente.")
+        }
+    }
+
+    return Produto(
+        id = id!!,
+        nome = nome,
+        preco = preco!!,
+        quantidade = quantidade!!
+    )
+}
+
+fun Int?.isNullOrNegative(): Boolean {
+    return this == null || this < 0
+}
+
+fun Double?.isNullOrNegative(): Boolean {
+    return this == null || this < 0
+}
+
+enum class AcoesMenu {
+    DESCONHECIDA,
+    ADICIONAR_PRODUTO,
+    ATUALIZAR_PRODUTO,
+    DELETAR_PRODUTO,
+    BUSCAR_PRODUTO,
+    SAIR
 }
 
 fun main() {
     val estoqueDeProdutos = EstoqueDeProdutos()
 
     var acao: Int? = null
-
-    while (acao != 5){
+    while(acao != AcoesMenu.SAIR.ordinal) {
         // https://tableconvert.com/ascii-generator
         println(
             """
@@ -153,60 +168,85 @@ fun main() {
         +---------------------------------+
         """
         )
-        println("LISTA ATUAL DE PRODUTOS EM ESTOQUE: ")
+        println("LISTA ATUAL DE PRODUTOS EM ESTOQUE:")
         println(
             estoqueDeProdutos.buscarTodos().joinToString(
-                separator = "\n",
-            ).ifEmpty { "Nenhum produto foi adicionado ao estoque até o momento." }
-        )
+                separator = "\n"
+            ).ifEmpty { "Nenhum produto foi adicionado ao estoque até o momento." })
+
+        println("\nInsira a ação de controle de estoque:")
         print("-> ")
         acao = readlnOrNull()?.toIntOrNull()
 
         when (acao) {
-            1 -> {
-                val produto = preencherProduto()
+            AcoesMenu.ADICIONAR_PRODUTO.ordinal -> {
+                val produto = preencherProdutos()
                 estoqueDeProdutos.inserir(item = produto)
-                println("Produto adicionado com sucesso!")
+                println("O produto foi inserido com SUCESSO!")
             }
-            2 -> {
+
+            AcoesMenu.ATUALIZAR_PRODUTO.ordinal -> {
                 var id: Int? = null
-                while (id == null){
-                    println("Informe o ID do produto a ser atualizado: ")
+                println("Insira o ID do produto a ser atualizado:")
+                while (id.isNullOrNegative()) {
                     print("-> ")
                     id = readlnOrNull()?.toIntOrNull()
-                    if (id == null || estoqueDeProdutos.buscar(id = id) == null){
-                        println("ID informado é inválido. Tente novamente.")
+                    if (id.isNullOrNegative() || estoqueDeProdutos.buscar(id = id!!) == null) {
+                        println("O ID inserido é inválido. Tente novamente.")
                     }
                 }
-                val produtoASerAtualizado = estoqueDeProdutos.buscar(id = id)
+
+                val produtoASerAtualizado = estoqueDeProdutos.buscar(id = id!!)
                 produtoASerAtualizado?.let {
                     val produtoAtualizado = preencherProdutoAtualizado(produtoASerAtualizado = it)
                     estoqueDeProdutos.atualizar(item = produtoAtualizado)
-                    println("Produto atualizado com sucesso!")
+                    println("O produto foi atualizado com SUCESSO!")
                 }
             }
-            3 -> {
+
+            AcoesMenu.DELETAR_PRODUTO.ordinal -> {
                 var id: Int? = null
-                while (id == null){
-                    println("Informe o ID do produto: ")
+                println("Insira o ID do produto a ser deletado:")
+                while (id.isNullOrNegative()) {
                     print("-> ")
                     id = readlnOrNull()?.toIntOrNull()
-                    if (id == null){
-                        println("ID informado é inválido. Tente novamente.");
+                    if (id.isNullOrNegative()) {
+                        println("O ID inserido é inválido. Tente novamente.")
                     }
                 }
-            }
-            4 -> {
 
+                val produtoDeletado = estoqueDeProdutos.deletar(id = id!!)
+                println(
+                    if (produtoDeletado) "O produto foi deletado com SUCESSO!"
+                    else "Não existe nenhum produto com esse ID."
+                )
             }
-            5 -> {
-                println("Obrigado, volte sempre!")
+
+            AcoesMenu.BUSCAR_PRODUTO.ordinal -> {
+                var id: Int? = null
+                println("Insira o ID do produto a ser buscado:")
+                while (id.isNullOrNegative()) {
+                    print("-> ")
+                    id = readlnOrNull()?.toIntOrNull()
+                    if (id.isNullOrNegative()) {
+                        println("O ID inserido é inválido. Tente novamente.")
+                    }
+                }
+
+                val produtoBuscado = estoqueDeProdutos.buscar(id = id!!)
+                println(
+                    if (produtoBuscado != null) "O produto buscado é: $produtoBuscado"
+                    else "Não existe nenhum produto com esse ID."
+                )
             }
+
+            AcoesMenu.SAIR.ordinal -> {
+                println("Obrigado. Volte sempre!")
+            }
+
             else -> {
-                println("Opção escolhida é inválida. Tente novamente.")
+                println("Opção inválida. Tente novamente.")
             }
         }
     }
-
-
 }
